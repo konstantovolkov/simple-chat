@@ -15,7 +15,6 @@ FROM node:16.14.2-alpine
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=8080
 EXPOSE 8080
 
 COPY package.json ./

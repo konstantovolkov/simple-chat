@@ -1,7 +1,7 @@
 import React, { FormEventHandler, useEffect, useState } from 'react';
 
 const webSocketUrl = process.env.NODE_ENV === 'production' ?
-  `ws://${window.location.host}/chat`:
+  `wss://${window.location.host}/chat` :
   'ws://localhost:8080/chat'
 
 const ws = new WebSocket(webSocketUrl);
@@ -19,14 +19,28 @@ interface ChatData {
 }
 
 function App() {
+  const [isWsReady, setIsWsReady] = useState(false);
   const [chatData, setChatData] = useState<ChatData>();
   const [newMessage, setNewMessage] = useState('');
 
+  const handleWsOpen = () => {
+    setIsWsReady(true);
+  };
+
+  const handleWsMessage = ({ data }: MessageEvent) => {
+    const parsedData = JSON.parse(data) as ChatData;
+    setChatData(parsedData);
+  };
+
   useEffect(() => {
-    ws.addEventListener('message', ({ data }) => {
-      const parsedData = JSON.parse(data) as ChatData;
-      setChatData(parsedData);
-    })
+    ws.addEventListener('message', handleWsMessage)
+
+    ws.addEventListener('open', handleWsOpen)
+
+    return () => {
+      ws.removeEventListener('message', handleWsMessage);
+      ws.removeEventListener('open', handleWsOpen);
+    }
   }, [])
 
   const sendMessage: FormEventHandler = (e) => {
@@ -38,6 +52,8 @@ function App() {
 
     setNewMessage('')
   }
+
+  if (!isWsReady) return null;
 
   return (
     <div>

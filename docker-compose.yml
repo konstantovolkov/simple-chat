@@ -1,10 +1,14 @@
 version: '3.8'
 services:
   backend:
+    environment:
+      - PORT=8080
     build: ./backend
     ports:
       - "8080:8080"
   client:
+    environment:
+      - WEBSOCKET_API=http://backend:8080
     build: ./client
     depends_on: 
       - server

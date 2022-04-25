@@ -1,7 +1,9 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
+const WEBSOCKET_API = process.env.WEBSOCKET_API;
+
 const wsProxy = createProxyMiddleware({
-    target: 'http://backend:8080',
+    target: WEBSOCKET_API,
     changeOrigin: true,
     ws: true,
   })
